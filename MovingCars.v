@@ -28,8 +28,8 @@ reg				tickHz = 1'b0;							// register to set if count equal to 500 hz
 wire			reset = 1'b0;
 reg		[3:0]	animFlag = 4'b0000;
 reg				myFlag = 1'b0;							// flag tells whether painting lines had reached end of screen
-reg		[2:0]	speed;									// defines value at which white lines should move, varied based on level
-reg		[2:0]	countFlag = 3'b000;						// value used to check against speed value
+reg		[3:0]	speed;									// defines value at which white lines should move, varied based on level
+reg		[3:0]	countFlag = 4'b0000;						// value used to check against speed value
 
 // car 1 start coordinates
 reg [9:0] car_x1 = 170;		// first lane
@@ -52,7 +52,7 @@ reg [9:0] car_y6 = 0;		// top of screen
 
 
 reg [6:0] score = 0;
-reg [1:0] level = 2'b00;
+reg [1:0] level;
 
 // enable wire for cars
 reg enable_c1 = 1'b0;
@@ -160,7 +160,7 @@ always @(posedge clk) begin
             score <= score + 1;
         end
     end 
-    if (score > 35) begin
+    if (score > 50) begin
         score <= 0;
     end
 end

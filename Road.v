@@ -48,8 +48,8 @@ wire	[31:0]	topCountHz = ((100000000 / 500) - 1);	// count value for 500 hz
 reg				tickHz = 1'b0;							// register to set if count equal to 500 hz
 reg		[3:0]	animFlag = 4'b0000;
 reg				myFlag = 1'b0;							// flag tells whether painting lines had reached end of screen
-reg		[2:0]	speed;									// defines value at which white lines should move, varied based on level
-reg		[2:0]	countFlag = 3'b000;						// value used to check against speed value
+reg		[3:0]	speed;									// defines value at which white lines should move, varied based on level
+reg		[3:0]	countFlag = 4'b0000;						// value used to check against speed value
 
 wire	[11:0]	whiteLinesOut;
 wire	[11:0]  track_color;
@@ -58,10 +58,10 @@ wire	[11:0]  track_color;
 // 00 - 6, 01 - 4, 10 - 2, 11 - 1	
 always @(posedge clk) begin
 	case (level)
-		2'b00: speed <= 6;								// if level 1 count for 8 times
-		2'b01: speed <= 5;								// if level 2 count for 6 times
+		2'b00: speed <= 8;								// if level 1 count for 8 times
+		2'b01: speed <= 6;								// if level 2 count for 6 times
 		2'b10: speed <= 4;								// if level 3 count for 4 times
-		2'b11: speed <= 3;								// if level 4 count for 2 time
+		2'b11: speed <= 2;								// if level 4 count for 2 time
 	endcase
 end
 	
