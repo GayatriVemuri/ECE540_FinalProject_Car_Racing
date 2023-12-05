@@ -83,8 +83,10 @@ assign wb_dat_o = (wb_adr_i[5:2]==0) ? wb_vga_reg: wb_vga_reg2;
 // Road_Top module which show road image with white lines
 wire [11:0] road_out;
 
+
 // test level logic
-reg [1:0] level;
+wire [1:0] level;
+/*
 reg [2:0] level_num = 3'b000;
 reg [31:0] count_level = 32'h00000000;
 reg [31:0] max_count = 32'h05FFFFFF;
@@ -106,6 +108,7 @@ always @(posedge vga_clk) begin
         default: level <= 2'b00;
     endcase
 end
+*/
 
 wire [10:0] car_yellow_addr;
 reg [11:0] car_yellow_out;
@@ -162,7 +165,7 @@ Moving_Cars_Top MovingCar (
     .clk(vga_clk),
     .pix_row(pix_row),
     .pix_col(pix_col),
-    .level(level),
+    .level_out(level),
     .moving_cars_out(moving_cars_out));
 
 Combine_Top Combine (

@@ -3,7 +3,7 @@
 // DodgeCar.v - Dodge_Car_Top module for ECE 540 Final Project
 // 
 // Author: Gayatri Vemuri (gayatri@pdx.edu)
-// Date: 12/04/2023
+// Date: 12/02/2023
 //
 // Description:
 // ------------
@@ -16,7 +16,7 @@
 `timescale  1 ns / 1 ps
 
 module Dodge_Car_Top (
-	input wire 			clk,
+	input wire 			clk, enable,
 	input wire [9:0]	pix_row, pix_col,
 	input wire [9:0]	car_x, car_y,
 	output reg [11:0]	dodge_car_out
@@ -62,14 +62,14 @@ end
 // Printing car mage when in boundary or else Black out.
 always @(posedge clk) begin
 	// 32 x 64 image (64 rows & 32 columns)
-	if((index_x >= 0 && index_x < 32) && (index_y >= 0 && index_y < 64)) begin
+	if(enable && (index_x >= 0 && index_x < 32) && (index_y >= 0 && index_y < 64)) begin
 		car_addr <= {index_y[5:0], index_x[4:0]};
 		dodge_car_out <= car_out;
     end
     else begin
         dodge_car_out <= BLACK;
     end   
-end
+end        
 
 // Concatenate all colors
 assign car_out = {pixel_dout_blue[3:0], pixel_dout_green[3:0], pixel_dout_red[3:0]};

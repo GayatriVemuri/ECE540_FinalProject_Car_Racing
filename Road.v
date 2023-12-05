@@ -43,10 +43,9 @@ reg [9:0]	line_c1_end = 258;
 reg [9:0]	line_c2_start = 383;
 reg [9:0]	line_c2_end = 386;
 
-reg		[31:0]	countHz;								// variable for counting
+reg		[31:0]	countHz = {32{1'b0}};								// variable for counting
 wire	[31:0]	topCountHz = ((100000000 / 500) - 1);	// count value for 500 hz
 reg				tickHz = 1'b0;							// register to set if count equal to 500 hz
-wire			reset = 1'b0;
 reg		[3:0]	animFlag = 4'b0000;
 reg				myFlag = 1'b0;							// flag tells whether painting lines had reached end of screen
 reg		[2:0]	speed;									// defines value at which white lines should move, varied based on level
@@ -59,18 +58,15 @@ wire	[11:0]  track_color;
 // 00 - 6, 01 - 4, 10 - 2, 11 - 1	
 always @(posedge clk) begin
 	case (level)
-		2'b00: speed <= 6;								// if level 1 count for 6 times
-		2'b01: speed <= 4;								// if level 2 count for 4 times
-		2'b10: speed <= 2;								// if level 3 count for 2 times
-		2'b11: speed <= 1;								// if level 4 count for 1 time
+		2'b00: speed <= 6;								// if level 1 count for 8 times
+		2'b01: speed <= 5;								// if level 2 count for 6 times
+		2'b10: speed <= 4;								// if level 3 count for 4 times
+		2'b11: speed <= 3;								// if level 4 count for 2 time
 	endcase
 end
 	
 always @(posedge clk) begin								// on positive edge of clock
-	if (reset) begin									// if reset is high, clear count
-		countHz <= {32{1'b0}};
-	end
-	else if (countHz == topCountHz) begin				// if countHz equal to count value for 500hz then		       
+	if (countHz == topCountHz) begin				// if countHz equal to count value for 500hz then		       
 		if (countFlag == speed) begin					// if speed value (varied according to level) equals count value (times base count (500 hz) has reached its value) 
 			tickHz <= 1'b1;								// set tickHz register
 			countFlag <= 0;
