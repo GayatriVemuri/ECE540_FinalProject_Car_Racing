@@ -1,8 +1,6 @@
+
 #include <stdio.h> 
-
-
 #include <stdio.h>  // Standard I/O  
-
 #include <stdio.h>  // Standard I/O  
 #include <sys/_types.h>
 
@@ -45,7 +43,7 @@ int main(void) {
     unsigned int car_horizontal_pos = 405 << 10| 305; // Initial car position
     unsigned int En_Value = 0x0000; // Enable value to set GPIO module to input mode for buttons
     unsigned int Counter_Max = 10000;
-    unsigned int print;
+    unsigned int reset;
     
 
     // Initialize GPIO2 to input mode for buttons
@@ -84,12 +82,10 @@ int main(void) {
             WRITE_PERIPHERAL(VGA_ROW_COL, En_Value);
             
         }
-        /*else if (READ_PERIPHERAL(GPIO2_IN) & BTNR_MASK){
-          if (MAX_LEFT_LANE <= car_horizontal_pos <= MAX_RIGHT_LANE){
-            car_horizontal_pos = 405 << 10| 305; //initial value
-          } 
-          En_Value = car_horizontal_pos;
-          WRITE_PERIPHERAL(VGA_ROW_COL, En_Value);
+        /*else if (READ_PERIPHERAL(GPIO2_IN) & BTNU_MASK){
+          
+            En_value = 32'b00000000000000000000000000000001;                //check this with wb logic 
+            WRITE_PERIPHERAL(VGA_DATA, En_Value);                          
         }
         */
 
