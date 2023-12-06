@@ -17,6 +17,7 @@
 
 module Moving_Cars_Top (
 	input wire 			clk,
+	//input wire          reset,
 	input wire [9:0]	pix_row, pix_col,
 	output reg [1:0]    level_out,
 	output reg [5:0]	score_out,
@@ -26,9 +27,8 @@ module Moving_Cars_Top (
 reg		[31:0]	countHz = {32{1'b0}};					// variable for counting
 wire	[31:0]	topCountHz = ((100000000 / 500) - 1);	// count value for 500 hz
 reg				tickHz = 1'b0;							// register to set if count equal to 500 hz
-wire			reset = 1'b0;
-reg		[3:0]	animFlag = 4'b0000;
-reg				myFlag = 1'b0;							// flag tells whether painting lines had reached end of screen
+//reg		[3:0]	animFlag = 4'b0000;
+//reg				myFlag = 1'b0;							// flag tells whether painting lines had reached end of screen
 reg		[3:0]	speed;									// defines value at which white lines should move, varied based on level
 reg		[3:0]	countFlag = 4'b0000;						// value used to check against speed value
 
@@ -45,12 +45,13 @@ reg [9:0] car_y3 = 0;		// top of screen
 reg [9:0] car_x4 = 450;		//first lane
 reg [9:0] car_y4 = 0;		// top of screen
 
+/*
 reg [9:0] car_x5 = 180;		//first lane
 reg [9:0] car_y5 = 0;		// top of screen
 
 reg [9:0] car_x6 = 420;		//first lane
 reg [9:0] car_y6 = 0;		// top of screen
-
+*/
 
 reg [5:0] score = 0;
 reg [1:0] level;
@@ -60,8 +61,8 @@ reg enable_c1 = 1'b0;
 reg enable_c2 = 1'b0;
 reg enable_c3 = 1'b0;
 reg enable_c4 = 1'b0;
-reg enable_c5 = 1'b0;
-reg enable_c6 = 1'b0;
+//reg enable_c5 = 1'b0;
+//reg enable_c6 = 1'b0;
 
 // speed calculation
 always @(posedge clk) begin
@@ -94,6 +95,29 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin								// on positive edge of clock
+/*if (reset) begin
+    car_x1 = 170;		// first lane
+    car_y1 = 0;		// top of screen
+    car_x2 = 400;		// third lane
+    car_y2 = 0;		// top of screen
+    car_x3 = 300;		//first lane
+    car_y3 = 0;		// top of screen
+    car_x4 = 450;		//first lane
+    car_y4 = 0;		// top of screen
+    
+    enable_c1 = 1'b0;
+    enable_c2 = 1'b0;
+    enable_c3 = 1'b0;
+    enable_c4 = 1'b0;
+    //enable_c5 = 1'b0;
+    //enable_c6 = 1'b0;
+    
+    score = 0;
+    countHz = {32{1'b0}};
+    tickHz <= 1'b0;
+    countFlag = 4'b0000;
+end
+else begin*/
 	if (countHz == topCountHz) begin				// if countHz equal to count value for 500hz then		       
 		if (countFlag == speed) begin					// if speed value (varied according to level) equals count value (times base count (500 hz) has reached its value) 
 			tickHz <= 1'b1;								// set tickHz register
@@ -128,8 +152,10 @@ always @(posedge clk) begin								// on positive edge of clock
 	else begin											// if reset is low and count not equal then
 		countHz <= countHz + 1'b1;						// increment compassCount10hz
 		tickHz <= 1'b0;									// clear tickHz register
-    end 
+    end
+//end
 end
+
 
 // Increment logic for y position
 always @(posedge clk) begin
@@ -171,7 +197,7 @@ always @(posedge clk) begin
     end
     */
     if (score > 50) begin
-        score <= 0;
+        score <= 50;
     end
 end
 
