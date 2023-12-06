@@ -38,7 +38,7 @@ parameter ROW_START = 0;
 parameter ROW_END = 479;
 
 // Colors for tracks
-parameter GREEN	= 12'b000011110000;					// turn on only 4 bits of green (color[7:4] represents green)
+parameter GREEN	= 12'b000111110001;					// turn on only 4 bits of green (color[7:4] represents green)
 parameter WHITE	= 12'b111111111111;					// turn on only 4 bits of green (color[7:4] represents green)
 parameter BLACK = 12'b000000000000;
 parameter CLAY = 12'b110010000110;					// R = 12, G = 8, B = 6

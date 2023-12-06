@@ -10,7 +10,7 @@
 // It takes current pixel location (pixelRow, pixelCol) from dtg as inputs.
 // It also takes X, Y coordinates (starting point) of the car.
 // It outputs 12 bit value of car image at a specified pixel location else BLACK.
-// 
+// Also outputs 2 bit level which is given as an input to road and 6 bits score.
 ////////////////////////////////////////////////////////////////////////////////////////
 
 `timescale  1 ns / 1 ps
@@ -19,6 +19,7 @@ module Moving_Cars_Top (
 	input wire 			clk,
 	input wire [9:0]	pix_row, pix_col,
 	output reg [1:0]    level_out,
+	output reg [5:0]	score_out,
 	output reg [11:0] 	moving_cars_out
 );
 
@@ -51,7 +52,7 @@ reg [9:0] car_x6 = 420;		//first lane
 reg [9:0] car_y6 = 0;		// top of screen
 
 
-reg [6:0] score = 0;
+reg [5:0] score = 0;
 reg [1:0] level;
 
 // enable wire for cars
@@ -75,19 +76,19 @@ end
 // level calculation
 always @(posedge clk) begin
     // first 10 cars level 0
-    if (score >= 0 && score <= 10) begin
+    if (score >= 0 && score <= 5) begin
         level <= 2'b00;
     end
     // next 10 cars level 1
-    if (score >= 11 && score <= 20) begin
+    if (score >= 6 && score <= 15) begin
         level <= 2'b01;
     end
     // next 15 cars dodged level 2
-    else if (score >= 21 && score <= 35) begin
+    else if (score >= 16 && score <= 25) begin
         level <= 2'b10;
     end
     // next 15 cars dodged level 3
-    else if (score >= 36 && score <= 50) begin
+    else if (score >= 26 && score <= 40) begin
         level <= 2'b11;
     end
 end
@@ -109,10 +110,11 @@ always @(posedge clk) begin								// on positive edge of clock
 			if (car_y3 >= 100) begin
                 enable_c4 <= 1'b1;
 			end 
-			/*
+			
 			else if (car_y4 >= 100) begin
                 enable_c5 <= 1'b1;
 			end
+			/*
 			else if (car_y5 >= 100) begin
                 enable_c6 <= 1'b1;
 			end
@@ -160,7 +162,14 @@ always @(posedge clk) begin
             score <= score + 1;
         end
     end 
-    if (score > 50) begin
+    if ((tickHz & enable_c5) == 1'b1) begin
+        car_y5 <= car_y5 + 4;
+        if (car_y5 > 480) begin
+            car_y5 <= 0;
+            score <= score + 1;
+        end
+    end 
+    if (score > 40) begin
         score <= 0;
     end
 end
@@ -179,6 +188,7 @@ assign display_car_OR_out = display_car_out1 | display_car_out2 | display_car_ou
 always @(posedge clk) begin
 	moving_cars_out <= display_car_OR_out;
 	level_out <= level;
+	score_out <= score;
 end
 
 // 6 Dodge car instance

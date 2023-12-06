@@ -58,10 +58,10 @@ wire	[11:0]  track_color;
 // 00 - 6, 01 - 4, 10 - 2, 11 - 1	
 always @(posedge clk) begin
 	case (level)
-		2'b00: speed <= 8;								// if level 1 count for 8 times
-		2'b01: speed <= 6;								// if level 2 count for 6 times
-		2'b10: speed <= 4;								// if level 3 count for 4 times
-		2'b11: speed <= 2;								// if level 4 count for 2 time
+		2'b00: speed <= 6;								// if level 1 count for 8 times
+		2'b01: speed <= 4;								// if level 2 count for 6 times
+		2'b10: speed <= 2;								// if level 3 count for 4 times
+		2'b11: speed <= 1;								// if level 4 count for 2 time
 	endcase
 end
 	

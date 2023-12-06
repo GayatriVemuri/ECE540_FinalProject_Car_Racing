@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////
+//
+// vga_top.v - vga_top module for ECE 540 Final Project
+// 
+// Author: 
+// Date: 12/02/2023
+//
+// Description:
+// ------------
+//
+// 
+///////////////////////////////////////////////////////////////////////////
+
+
 // Yellow car boundary cell
 `define YELLOW_CAR_ROW_1    10'h1AD // 479
 `define YELLOW_CAR_ROW_2    10'h195 // 429
@@ -17,8 +31,6 @@ module vga_top(
 
 parameter dw = 32;
 parameter aw = 32;
-
-
 
 //
 // WISHBONE Interface
@@ -52,81 +64,43 @@ output wire [13:0]  ext_pad_o;	// VGA Outputs
   wire [3:0] dout_r;
   wire [3:0] dout_g;
   wire [3:0] dout_b;
- 
 
 reg [3:0] RED;
 reg [3:0] GREEN; 
 reg [3:0] BLUE;
-  
 
-reg [31:0] wb_vga_reg, wb_vga_reg2;
+reg [9:0] car_yellowX;     // location x start point
+reg [9:0] car_yellowY;     // location y start point 
+
+reg [31:0] VGA_ROW_COL, VGA_DATA;
 reg         wb_vga_ack_ff;
 always @(posedge wb_clk_i, posedge wb_rst_i) begin
 if (wb_rst_i) begin
-wb_vga_reg = 32'h00 ;
-wb_vga_reg2 = 32'h00;
+VGA_ROW_COL = 32'h00 ;
+VGA_DATA = 32'h00;
 wb_vga_ack_ff = 0 ;
 end
 else begin
 case (wb_adr_i[5:2])
-0: wb_vga_reg = wb_vga_ack_ff && wb_we_i ? wb_dat_o : wb_vga_reg;
-1: wb_vga_reg2 = wb_vga_ack_ff && wb_we_i ? wb_dat_o : wb_vga_reg2;
+0: VGA_ROW_COL = wb_vga_ack_ff && wb_we_i ? wb_dat_o : VGA_ROW_COL;
+1: VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_o : VGA_DATA;
 endcase
 // Ensure 1 wait state even for back to back host requests
 wb_vga_ack_ff = ! wb_vga_ack_ff & wb_stb_i & wb_cyc_i;
 end
 end
 assign wb_ack_o = wb_vga_ack_ff;
-assign wb_dat_o = (wb_adr_i[5:2]==0) ? wb_vga_reg: wb_vga_reg2;
+assign wb_dat_o = (wb_adr_i[5:2]==0) ? VGA_ROW_COL: VGA_DATA;
 
 
 // Road_Top module which show road image with white lines
 wire [11:0] road_out;
 
-
 // test level logic
 wire [1:0] level;
-/*
-reg [2:0] level_num = 3'b000;
-reg [31:0] count_level = 32'h00000000;
-reg [31:0] max_count = 32'h05FFFFFF;
 
-always @(posedge vga_clk) begin
-    count_level <= count_level + 1;
-    if (count_level == max_count) begin
-        count_level <= 32'h00000000;
-        level_num <= level_num + 3'b001;
-        if (level_num == 3'b100) begin
-            level_num <= 3'b000;
-        end
-    end
-    case(level_num)
-        3'b000: level <= level_num[1:0];
-        3'b001: level <= level_num[1:0];
-        3'b010: level <= level_num[1:0];
-        3'b011: level <= level_num[1:0];
-        default: level <= 2'b00;
-    endcase
-end
-*/
-
-wire [10:0] car_yellow_addr;
-reg [11:0] car_yellow_out;
-wire [3:0] pixel_dout_red;
-wire [3:0] pixel_dout_blue;
-wire [3:0] pixel_dout_green;
-//wire video_on;
-
-// Car position start point
-reg [9:0] car_yellowX = 447;     // location x start point
-reg [9:0] car_yellowY = 305;     // location y start point 
-reg [9:0] car_r1 = 447;
-reg [9:0] car_c1 = 305;
-reg [9:0] car_r2 = 479;
-reg [9:0] car_c2 = 336;
-reg [9:0] index_yellowX, index_yellowY;
-reg [4:0] x_max = 32;
-reg [5:0] y_max = 64;
+// score wire
+wire [5:0] score;
 
 parameter WHITE	= 12'b111111111111;
 parameter BLACK = 12'b000000000000;
@@ -135,6 +109,13 @@ parameter BLACK = 12'b000000000000;
 wire [11:0] player_car_out;
 wire [11:0] vga_out;
 wire [11:0] moving_cars_out;
+wire        win_reset_flag;
+wire [11:0] you_win_out;
+
+always @(posedge wb_clk_i) begin
+    car_yellowX <= VGA_ROW_COL [9:0];
+    car_yellowY <= 405;
+end
 
 
 dtg_top dtg_top_inst(
@@ -159,6 +140,8 @@ Player_Car_Top PlayerCar (
 	.clk(vga_clk),
     .pix_row(pix_row),
     .pix_col(pix_col),
+    .car_yellowX(car_yellowX),
+    .car_yellowY(car_yellowY),
     .player_car_out(player_car_out));
     
 Moving_Cars_Top MovingCar (
@@ -166,7 +149,17 @@ Moving_Cars_Top MovingCar (
     .pix_row(pix_row),
     .pix_col(pix_col),
     .level_out(level),
+    .score_out(score),
     .moving_cars_out(moving_cars_out));
+    
+You_Win_Top YouWin (
+    .clk(vga_clk),
+    .pix_row(pix_row),
+    .pix_col(pix_col),
+    .score_in(score),
+    .win_reset_flag(win_reset_flag),
+    .you_win_out(you_win_out));
+    
 
 Combine_Top Combine (
 	.clk(vga_clk),
@@ -176,6 +169,8 @@ Combine_Top Combine (
     .road_in(road_out),
     .player_car_in(player_car_out),
     .moving_cars_in(moving_cars_out),
+    .you_win_in(you_win_out),
+    .win_reset_flag(win_reset_flag),
     .vga_out(vga_out));
 
 //
