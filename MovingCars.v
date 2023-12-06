@@ -39,7 +39,7 @@ reg [9:0] car_y1 = 0;		// top of screen
 reg [9:0] car_x2 = 400;		// third lane
 reg [9:0] car_y2 = 0;		// top of screen
 
-reg [9:0] car_x3 = 150;		//first lane
+reg [9:0] car_x3 = 300;		//first lane
 reg [9:0] car_y3 = 0;		// top of screen
 
 reg [9:0] car_x4 = 450;		//first lane
@@ -66,9 +66,9 @@ reg enable_c6 = 1'b0;
 // speed calculation
 always @(posedge clk) begin
 	case (level)
-		2'b00: speed <= 8;								// if level 1 count for 8 times
-		2'b01: speed <= 6;								// if level 2 count for 6 times
-		2'b10: speed <= 4;								// if level 3 count for 4 times
+		2'b00: speed <= 6;								// if level 1 count for 8 times
+		2'b01: speed <= 4;								// if level 2 count for 6 times
+		2'b10: speed <= 3;								// if level 3 count for 4 times
 		2'b11: speed <= 2;								// if level 4 count for 2 time
 	endcase
 end
@@ -76,19 +76,19 @@ end
 // level calculation
 always @(posedge clk) begin
     // first 10 cars level 0
-    if (score >= 0 && score <= 5) begin
+    if (score >= 0 && score <= 9) begin
         level <= 2'b00;
     end
     // next 10 cars level 1
-    if (score >= 6 && score <= 15) begin
+    if (score >= 10 && score <= 19) begin
         level <= 2'b01;
     end
     // next 15 cars dodged level 2
-    else if (score >= 16 && score <= 25) begin
+    else if (score >= 20 && score <= 34) begin
         level <= 2'b10;
     end
     // next 15 cars dodged level 3
-    else if (score >= 26 && score <= 40) begin
+    else if (score >= 35 && score <= 50) begin
         level <= 2'b11;
     end
 end
@@ -110,11 +110,10 @@ always @(posedge clk) begin								// on positive edge of clock
 			if (car_y3 >= 100) begin
                 enable_c4 <= 1'b1;
 			end 
-			
+			/*
 			else if (car_y4 >= 100) begin
                 enable_c5 <= 1'b1;
 			end
-			/*
 			else if (car_y5 >= 100) begin
                 enable_c6 <= 1'b1;
 			end
@@ -161,15 +160,17 @@ always @(posedge clk) begin
             car_y4 <= 0;
             score <= score + 1;
         end
-    end 
+    end
+    /*
     if ((tickHz & enable_c5) == 1'b1) begin
         car_y5 <= car_y5 + 4;
         if (car_y5 > 480) begin
             car_y5 <= 0;
             score <= score + 1;
         end
-    end 
-    if (score > 40) begin
+    end
+    */
+    if (score > 50) begin
         score <= 0;
     end
 end
@@ -180,10 +181,10 @@ wire [11:0] display_car_out1;
 wire [11:0] display_car_out2;
 wire [11:0] display_car_out3;
 wire [11:0] display_car_out4;
-wire [11:0] display_car_out5;
-wire [11:0] display_car_out6;
+//wire [11:0] display_car_out5;
+//wire [11:0] display_car_out6;
 
-assign display_car_OR_out = display_car_out1 | display_car_out2 | display_car_out3 | display_car_out4 | display_car_out5 | display_car_out6;
+assign display_car_OR_out = display_car_out1 | display_car_out2 | display_car_out3 | display_car_out4;
 
 always @(posedge clk) begin
 	moving_cars_out <= display_car_OR_out;
@@ -192,7 +193,7 @@ always @(posedge clk) begin
 end
 
 // 6 Dodge car instance
-Dodge_Car_Top display_car1 (
+Yellow_Car_1 display_car1 (
 	.clk(clk),
 	.enable(enable_c1),
 	.pix_row(pix_row), 
@@ -201,7 +202,7 @@ Dodge_Car_Top display_car1 (
 	.car_y(car_y1),
 	.dodge_car_out(display_car_out1));
 
-Dodge_Car_Top display_car2 (
+Black_Car_2 display_car2 (
 	.clk(clk),
 	.enable(enable_c2),
 	.pix_row(pix_row), 
@@ -210,7 +211,7 @@ Dodge_Car_Top display_car2 (
 	.car_y(car_y2),
 	.dodge_car_out(display_car_out2));
 	
-Dodge_Car_Top display_car3 (
+SUV_Car_2 display_car3 (
 	.clk(clk),
 	.enable(enable_c3),
 	.pix_row(pix_row), 
@@ -219,7 +220,7 @@ Dodge_Car_Top display_car3 (
 	.car_y(car_y3),
 	.dodge_car_out(display_car_out3));
 	
-Dodge_Car_Top display_car4 (
+Black_Car_2 display_car4 (
 	.clk(clk),
 	.enable(enable_c4),
 	.pix_row(pix_row), 
@@ -227,7 +228,7 @@ Dodge_Car_Top display_car4 (
 	.car_x(car_x4),
 	.car_y(car_y4),
 	.dodge_car_out(display_car_out4));
-	
+/*	
 Dodge_Car_Top display_car5 (
 	.clk(clk),
 	.enable(enable_c5),
@@ -245,6 +246,7 @@ Dodge_Car_Top display_car6 (
 	.car_x(car_x6),
 	.car_y(car_y6),
 	.dodge_car_out(display_car_out6));
-	
+*/
+
 endmodule
 
