@@ -26,6 +26,8 @@ module Combine_Top (
 	input wire [11:0]   moving_cars_in,      // moving cars
 	input wire [11:0]   you_win_in,          // you win
 	input wire          win_reset_flag,
+	input wire [11:0]   game_over_in,        // game over
+	input wire          game_over_flag,
 	output reg [11:0] 	vga_out
 );
 
@@ -35,6 +37,21 @@ parameter WHITE	= 12'b111111111111;
 reg player_car_set;
 reg moving_cars_set;
 reg reset_win = 1'b0;
+reg game_over_set = 1'b0;
+
+// Game over flag set
+always @(posedge clk) begin
+    if(game_over_flag) begin
+        game_over_set <= 1'b1;
+    end
+end
+
+// You win flag set
+always @(posedge clk) begin
+    if (win_reset_flag) begin
+        reset_win <= 1'b1;
+    end
+end
 
 // Player car
 always @(posedge clk) begin
@@ -56,20 +73,17 @@ always @(posedge clk) begin
 	end
 end
 
-/*
-always @(posedge clk) begin
-    if (video_on && win_reset_flag) begin
-        reset_win <= 1'b1;
-    end
-end
-*/
+
 // if video ON send the color to vga
 always @(posedge clk) begin
 	if (video_on) begin
-	   /*if (reset_win) begin
+	   if (game_over_set) begin
+	       vga_out <= game_over_in;
+	   end
+	   else if (reset_win) begin
 	       vga_out <= you_win_in;
         end
-		else */if (player_car_set) begin         // player car
+		else if (player_car_set) begin         // player car
 			vga_out <= player_car_in;
 		end
 		else if (moving_cars_set) begin   // moving car
