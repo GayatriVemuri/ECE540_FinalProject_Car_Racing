@@ -18,6 +18,7 @@
 
 module Player_Car_Top (
 	input wire 			clk,
+	//input wire          reset,
 	input wire [9:0]	pix_row, pix_col,
 	input wire [9:0]    car_yellowX, car_yellowY,
 	output reg [11:0]	player_car_out
@@ -33,15 +34,20 @@ wire [3:0] pixel_dout_green;
 reg [9:0] car_x;     // location x start point
 reg [9:0] car_y;     // location y start point 
 reg [9:0] index_yellowX, index_yellowY;
-//reg [4:0] x_max = 32;
-//reg [5:0] y_max = 64;
 
 parameter WHITE	= 12'b111111111111;
 parameter BLACK = 12'b000000000000;
 
+
 always @(posedge clk) begin
-    car_x <= car_yellowX;
-    car_y <= car_yellowY;
+    /*if (reset) begin
+        car_x <= 305;
+        car_y <= 405;
+    end
+    else begin*/
+        car_x <= car_yellowX;
+        car_y <= car_yellowY;
+    //end
 end
 
 // Getting the output from block memory
