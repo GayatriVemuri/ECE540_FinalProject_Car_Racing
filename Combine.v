@@ -56,19 +56,20 @@ always @(posedge clk) begin
 	end
 end
 
+/*
 always @(posedge clk) begin
     if (video_on && win_reset_flag) begin
         reset_win <= 1'b1;
     end
 end
-
+*/
 // if video ON send the color to vga
 always @(posedge clk) begin
 	if (video_on) begin
-	   if (reset_win) begin
+	   /*if (reset_win) begin
 	       vga_out <= you_win_in;
         end
-		else if (player_car_set) begin         // player car
+		else */if (player_car_set) begin         // player car
 			vga_out <= player_car_in;
 		end
 		else if (moving_cars_set) begin   // moving car
