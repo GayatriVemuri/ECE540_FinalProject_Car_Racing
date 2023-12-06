@@ -67,6 +67,7 @@ wire [3:0] dout_b;
 
 reg [9:0] car_yellowX;     // location x start point
 reg [9:0] car_yellowY;     // location y start point 
+//reg RESET;
 
 reg [31:0] VGA_ROW_COL, VGA_DATA;
 reg         wb_vga_ack_ff;
@@ -85,7 +86,10 @@ case (wb_adr_i[5:2])
     car_yellowX = VGA_ROW_COL [9:0]; 
     car_yellowY = VGA_ROW_COL [19:10];
 end
-1: VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_i : VGA_DATA;
+1: begin
+    VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_i : VGA_DATA;
+    //RESET = VGA_DATA[0];
+   end
 endcase
 
 
@@ -115,18 +119,9 @@ wire [11:0] vga_out;
 wire [11:0] moving_cars_out;
 wire        win_reset_flag;
 wire [11:0] you_win_out;
-/*
-always @(posedge wb_clk_i) begin
-    if (wb_rst_i) begin
-        car_yellowX <= 305;
-        car_yellowY <= 405;
-    end  
-    else begin
-        car_yellowX <= VGA_ROW_COL [9:0];
-        car_yellowY <= 405;
-    end
-end
-*/
+wire        collision_flag;
+wire [11:0] game_over_out;
+
 
 dtg_top dtg_top_inst(
 	.clock(vga_clk),
@@ -141,6 +136,7 @@ dtg_top dtg_top_inst(
   
 Road_Top Road (
     .clk(vga_clk),
+    //.reset(RESET),
     .pix_row(pix_row),
     .pix_col(pix_col),
     .level(level),
@@ -148,6 +144,7 @@ Road_Top Road (
     
 Player_Car_Top PlayerCar (
 	.clk(vga_clk),
+	//.reset(RESET),
     .pix_row(pix_row),
     .pix_col(pix_col),
     .car_yellowX(car_yellowX),
@@ -156,6 +153,7 @@ Player_Car_Top PlayerCar (
     
 Moving_Cars_Top MovingCar (
     .clk(vga_clk),
+    //.reset(RESET),
     .pix_row(pix_row),
     .pix_col(pix_col),
     .level_out(level),
@@ -170,6 +168,14 @@ You_Win_Top YouWin (
     .win_reset_flag(win_reset_flag),
     .you_win_out(you_win_out));
     
+Game_Over_Top GameOver (
+    .clk(vga_clk),
+    .pix_row(pix_row),
+    .pix_col(pix_col),
+    .moving_cars_in(moving_cars_out),
+    .player_car_in(player_car_out),
+    .collosion_flag(collision_flag),
+    .game_over_out(game_over_out));
 
 Combine_Top Combine (
 	.clk(vga_clk),
@@ -181,6 +187,8 @@ Combine_Top Combine (
     .moving_cars_in(moving_cars_out),
     .you_win_in(you_win_out),
     .win_reset_flag(win_reset_flag),
+    .game_over_in(game_over_out),
+    .game_over_flag(collision_flag),
     .vga_out(vga_out));
 
 //
