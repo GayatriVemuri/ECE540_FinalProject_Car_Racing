@@ -55,25 +55,23 @@ input wire            vga_clk;	// pixel clock
 output wire [13:0]  ext_pad_o;	// VGA Outputs
 
 
-  wire video_on;
-  wire H_SYNC;
-  wire V_SYNC;
-  wire [9:0] pix_row;
-  wire [9:0] pix_col;
-  wire [31:0] pix_num;
-  wire [3:0] dout_r;
-  wire [3:0] dout_g;
-  wire [3:0] dout_b;
-
-reg [3:0] RED;
-reg [3:0] GREEN; 
-reg [3:0] BLUE;
+wire video_on;
+wire H_SYNC;
+wire V_SYNC;
+wire [9:0] pix_row;
+wire [9:0] pix_col;
+wire [31:0] pix_num;
+wire [3:0] dout_r;
+wire [3:0] dout_g;
+wire [3:0] dout_b;
 
 reg [9:0] car_yellowX;     // location x start point
 reg [9:0] car_yellowY;     // location y start point 
 
 reg [31:0] VGA_ROW_COL, VGA_DATA;
 reg         wb_vga_ack_ff;
+
+
 always @(posedge wb_clk_i, posedge wb_rst_i) begin
 if (wb_rst_i) begin
 VGA_ROW_COL = 32'h00 ;
@@ -82,9 +80,15 @@ wb_vga_ack_ff = 0 ;
 end
 else begin
 case (wb_adr_i[5:2])
-0: VGA_ROW_COL = wb_vga_ack_ff && wb_we_i ? wb_dat_o : VGA_ROW_COL;
-1: VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_o : VGA_DATA;
+0: begin  
+    VGA_ROW_COL = wb_vga_ack_ff && wb_we_i ? wb_dat_i : VGA_ROW_COL;
+    car_yellowX = VGA_ROW_COL [9:0]; 
+    car_yellowY = VGA_ROW_COL [19:10];
+end
+1: VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_i : VGA_DATA;
 endcase
+
+
 // Ensure 1 wait state even for back to back host requests
 wb_vga_ack_ff = ! wb_vga_ack_ff & wb_stb_i & wb_cyc_i;
 end
@@ -111,12 +115,18 @@ wire [11:0] vga_out;
 wire [11:0] moving_cars_out;
 wire        win_reset_flag;
 wire [11:0] you_win_out;
-
+/*
 always @(posedge wb_clk_i) begin
-    car_yellowX <= VGA_ROW_COL [9:0];
-    car_yellowY <= 405;
+    if (wb_rst_i) begin
+        car_yellowX <= 305;
+        car_yellowY <= 405;
+    end  
+    else begin
+        car_yellowX <= VGA_ROW_COL [9:0];
+        car_yellowY <= 405;
+    end
 end
-
+*/
 
 dtg_top dtg_top_inst(
 	.clock(vga_clk),
@@ -177,7 +187,5 @@ Combine_Top Combine (
 // Generate VGA outputs
 
 assign ext_pad_o = {V_SYNC,H_SYNC,vga_out};
-
-
 
 endmodule
