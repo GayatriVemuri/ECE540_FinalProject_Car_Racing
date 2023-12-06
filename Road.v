@@ -19,6 +19,7 @@
 
 module Road_Top(
 	input wire 			clk,
+	//input wire          reset,
 	input wire [9:0]	pix_row, pix_col,
 	input wire [1:0]    level,
 	output reg [11:0]	road_out
@@ -84,12 +85,36 @@ always @(posedge clk) begin								// on positive edge of clock
 end
 
 always @(posedge clk) begin
+// if reset start from begining
+/*if (reset) begin
+line1_r_start = 0;
+line1_r_end = 47;
+line2_r_start = 95;
+line2_r_end = 143;
+line3_r_start = 191;
+line3_r_end = 239;
+line4_r_start = 287;
+line4_r_end = 335;
+line5_r_start = 383;
+line5_r_end = 431;
+line6_r_start = 383;
+line6_r_end = 431;
+line_c1_start = 255;
+line_c1_end = 258;
+line_c2_start = 383;
+line_c2_end = 386;
+animFlag <= 4'b0000;
+myFlag <= 1'b0;
+countHz = {32{1'b0}};
+countFlag <= 0;
+tickHz <= 1'b0;
+end
+else begin*/
     line_c1_start <= 255;
     line_c1_end <= 258;
     line_c2_start <= 383;
     line_c2_end <= 386;
     road_out = whiteLinesOut;
-    
     case(myFlag)
         1'b0: begin
             if (tickHz == 1'b1) begin
@@ -142,6 +167,7 @@ always @(posedge clk) begin
            end
         end
     endcase
+    //end
 end
 
 
