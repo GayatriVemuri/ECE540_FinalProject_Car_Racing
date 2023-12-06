@@ -45,19 +45,19 @@ always @(posedge clk) begin
 end
 
 // Getting the output from block memory
-blk_mem_gen_0 car_yellow_red (
+red_car_red_mem car_red_red (
     .clka(clk),    				// input wire clka
     .addra(car_yellow_addr),  	// input wire [10 : 0] addra
     .douta(pixel_dout_red)  	// output wire [3 : 0] douta
 );
 
-blk_mem_gen_1 car_yellow_green (
+red_car_green_mem car_red_green (
     .clka(clk),    				// input wire clka
     .addra(car_yellow_addr),  	// input wire [10 : 0] addra
     .douta(pixel_dout_green)  	// output wire [3 : 0] douta
 );
 
-blk_mem_gen_2 car_yellow_blue (
+red_car_blue_mem car_red_blue (
     .clka(clk),    				// input wire clka
     .addra(car_yellow_addr),  	// input wire [10 : 0] addra
     .douta(pixel_dout_blue)  	// output wire [3 : 0] douta
