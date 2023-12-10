@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////////////
 //
-// DodgeCar.v - Dodge_Car_Top module for ECE 540 Final Project
+// Black_Car_.2.v - Black_Car_2 module for ECE 540 Final Project
 // 
-// Author: Gayatri Vemuri (gayatri@pdx.edu)
+// Author: Gayatri Vemuri (gayatri@pdx.edu),Sahil Khan (sahilk@pdx.edu) 
 // Date: 12/02/2023
 //
 // Description:
@@ -16,13 +16,13 @@
 `timescale  1 ns / 1 ps
 
 module Black_Car_2 (
-	input wire 			clk, enable,
+	input wire 		clk, enable,
 	input wire [9:0]	pix_row, pix_col,
 	input wire [9:0]	car_x, car_y,
 	output reg [11:0]	dodge_car_out
 );
 
-reg  [10:0] car_addr;
+reg  [10:0] car_addr; // need 11 bits because our image is 32x64 = 2048 (11 bits)
 wire [11:0] car_out;
 wire [3:0] 	pixel_dout_red;
 wire [3:0] 	pixel_dout_blue;
@@ -36,7 +36,7 @@ parameter BLACK = 12'b000000000000;
 
 // ROM for car image
 black_car_red_mem black_car_red (
-  .clka(clk),               // input wire clka
+  .clka(clk),               // input wire clk
   .addra(car_addr),         // input wire [10 : 0] addra
   .douta(pixel_dout_red)    // output wire [3 : 0] douta
 );
@@ -63,11 +63,11 @@ end
 always @(posedge clk) begin
 	// 32 x 64 image (64 rows & 32 columns)
 	if(enable && (index_x >= 0 && index_x < 32) && (index_y >= 0 && index_y < 64)) begin
-		car_addr <= {index_y[5:0], index_x[4:0]};
-		dodge_car_out <= car_out;
+		car_addr <= {index_y[5:0], index_x[4:0]};  // 64x32 - 2048 (11 bits)
+		dodge_car_out <= car_out;                  // output concatenated image 
     end
     else begin
-        dodge_car_out <= BLACK;
+        dodge_car_out <= BLACK;    // else output BLACK
     end   
 end        
 
