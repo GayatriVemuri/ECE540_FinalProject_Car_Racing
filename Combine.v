@@ -2,12 +2,12 @@
 //
 // Combine.v - Combine_Top module for ECE 540 Final Project
 // 
-// Author: Gayatri Vemuri (gayatri@pdx.edu)
-// Date: 12/02/2023
+// Author: 	Gayatri Vemuri (gayatri@pdx.edu)
+// Date: 	12/02/2023
 //
 // Description:
 // ------------
-// It takes current pixel location (pixelRow, pixelCol) from dtg as inputs
+// It takes current pixel location (pix_row, pix_col) from dtg as inputs
 // Takes 12 bits value of road_out, player_car_out and checks at a given 
 // pixel location which should be outputted.
 // It outputs 12 bit value of the desired value at a specified pixel location.
@@ -19,21 +19,24 @@
 
 module Combine_Top (
 	input wire 			clk,
-	input wire [9:0]	pix_row, pix_col,
-	input wire 			video_on,
-	input wire [11:0]	road_in,			  // Road value
-	input wire [11:0]	player_car_in,		 // Player car
-	input wire [11:0]   moving_cars_in,      // moving cars
-	input wire [11:0]   you_win_in,          // you win
-	input wire          win_reset_flag,
-	input wire [11:0]   game_over_in,        // game over
-	input wire          game_over_flag,
-	output reg [11:0] 	vga_out
+	input wire [9:0]	pix_row, pix_col,		// current pixel being display on screen
+	input wire 			video_on,		// getting from dtg module
+	input wire [11:0]	road_in,			// Road value
+	input wire [11:0]	player_car_in,		 	// Player car
+	input wire [11:0]   moving_cars_in,      		// moving cars
+	input wire [11:0]   you_win_in,          		// you_win output
+	input wire          win_reset_flag,			// it tells if the game is ened by winning
+	input wire [11:0]   game_over_in,        		// game over output
+	input wire          game_over_flag,			// indicates game ended by a collision
+	output reg [11:0] 	vga_out				// muxed output sent to the vga output port
 );
 
+
+// Color intensity parameter
 parameter BLACK = 12'b000000000000;
 parameter WHITE	= 12'b111111111111;
 
+// Flags which indicates what needs to be outputted.
 reg player_car_set;
 reg moving_cars_set;
 reg reset_win = 1'b0;
@@ -74,27 +77,27 @@ always @(posedge clk) begin
 end
 
 
-// if video ON send the color to vga
+// if video ON send the color to vga else BLACK to vga
 always @(posedge clk) begin
 	if (video_on) begin
-	   if (game_over_set) begin
+	   if (game_over_set) begin			// If collision occured
 	       vga_out <= game_over_in;
 	   end
-	   else if (reset_win) begin
+	   else if (reset_win) begin			// If game ended with you winning
 	       vga_out <= you_win_in;
         end
-		else if (player_car_set) begin         // player car
+		else if (player_car_set) begin         	// player car on screen
 			vga_out <= player_car_in;
 		end
-		else if (moving_cars_set) begin   // moving car
+		else if (moving_cars_set) begin   	// moving car on screen
 			vga_out <= moving_cars_in;
 		end
 		else begin
-			vga_out <= road_in;
+			vga_out <= road_in;		// show road/whole screen image
 		end
     end
     else begin
-		vga_out <= BLACK;
+		vga_out <= BLACK;			// BLACK if video OFF.
 	end
 end	
 
