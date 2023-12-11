@@ -122,6 +122,9 @@ the number of cars that surpass the screen. If 10 cars pass, we change from leve
 more 10 cars for level 2 to level 3, 15 cars from level 3 to level 4, and then 20 cars to win the
 game.
 
+![image](https://github.com/GayatriVemuri/ECE540_FinalProject_Car_Racing/assets/104589505/38d988d9-b97b-4a91-9914-6e35e5032393)
+
+
 Conclusion
 We have successfully completed most of all our originally planned design features as
 mentioned in our project proposal document, and we succeeded in making a very
