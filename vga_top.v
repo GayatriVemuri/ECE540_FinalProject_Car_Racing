@@ -2,13 +2,15 @@
 //
 // vga_top.v - vga_top module for ECE 540 Final Project
 // 
-// Author: 
+// Author: Viraj Pashte (vpashte@pdx.edu), Sahil Khan (sahilk@pdx.edu), Gayatri vemuri (gayatri@pdx.edu)
 // Date: 12/02/2023
 //
 // Description:
 // ------------
 //
-// 
+// We use this module to instantiate all other sub modules to display the game.
+// Using the WishBone to read and write the peripheral to use the data from the firmware.
+// We cocantinate all the signals and get the output through vga out to the display.
 ///////////////////////////////////////////////////////////////////////////
 
 
@@ -35,24 +37,24 @@ parameter aw = 32;
 //
 // WISHBONE Interface
 //
-input wire            wb_clk_i;	// Clock
-input wire            wb_rst_i;	// Reset
-input wire            wb_cyc_i;	// cycle valid input
-input wire  [aw-1:0]  wb_adr_i;	// address bus inputs
-input wire  [dw-1:0]  wb_dat_i;	// input data bus
-input wire  [3:0]     wb_sel_i;	// byte select inputs
-input wire            wb_we_i;	// indicates write transfer
-input wire            wb_stb_i;	// strobe input
-output wire [dw-1:0]  wb_dat_o;	// output data bus
-output wire           wb_ack_o;	// normal termination
-output wire           wb_err_o;	// termination w/ error
+input wire            wb_clk_i;		// Clock
+input wire            wb_rst_i;		// Reset
+input wire            wb_cyc_i;		// cycle valid input
+input wire  [aw-1:0]  wb_adr_i;		// address bus inputs
+input wire  [dw-1:0]  wb_dat_i;		// input data bus
+input wire  [3:0]     wb_sel_i;		// byte select inputs
+input wire            wb_we_i;		// indicates write transfer
+input wire            wb_stb_i;		// strobe input
+output wire [dw-1:0]  wb_dat_o;		// output data bus
+output wire           wb_ack_o;		// normal termination
+output wire           wb_err_o;		// termination w/ error
 output wire           wb_inta_o;	// Interrupt request output
 
-input wire            vga_clk;	// pixel clock
+input wire            vga_clk;		// pixel clock
 
 //
 // External VGA Interface
-output wire [13:0]  ext_pad_o;	// VGA Outputs
+output wire [13:0]  ext_pad_o;		// VGA Outputs
 
 
 wire video_on;
@@ -67,7 +69,7 @@ wire [3:0] dout_b;
 
 reg [9:0] car_yellowX;     // location x start point
 reg [9:0] car_yellowY;     // location y start point 
-//reg RESET;
+
 
 reg [31:0] VGA_ROW_COL, VGA_DATA;
 reg         wb_vga_ack_ff;
@@ -88,7 +90,6 @@ case (wb_adr_i[5:2])
 end
 1: begin
     VGA_DATA = wb_vga_ack_ff && wb_we_i ? wb_dat_i : VGA_DATA;
-    //RESET = VGA_DATA[0];
    end
 endcase
 
@@ -113,7 +114,7 @@ wire [5:0] score;
 parameter WHITE	= 12'b111111111111;
 parameter BLACK = 12'b000000000000;
 
-
+// Internal Wiress
 wire [11:0] player_car_out;
 wire [11:0] vga_out;
 wire [11:0] moving_cars_out;
@@ -122,7 +123,7 @@ wire [11:0] you_win_out;
 wire        collision_flag;
 wire [11:0] game_over_out;
 
-
+// DTG module instance
 dtg_top dtg_top_inst(
 	.clock(vga_clk),
 	.rst(wb_rst_i),
@@ -133,7 +134,8 @@ dtg_top dtg_top_inst(
 	.pixel_column(pix_col),
 	.pix_num(pix_num)
   );
-  
+ 
+// Road module instance  
 Road_Top Road (
     .clk(vga_clk),
     //.reset(RESET),
@@ -142,6 +144,7 @@ Road_Top Road (
     .level(level),
     .road_out(road_out));
     
+// Player Car instance     
 Player_Car_Top PlayerCar (
 	.clk(vga_clk),
 	//.reset(RESET),
@@ -150,7 +153,8 @@ Player_Car_Top PlayerCar (
     .car_yellowX(car_yellowX),
     .car_yellowY(car_yellowY),
     .player_car_out(player_car_out));
-    
+
+// Moving cars module instance     
 Moving_Cars_Top MovingCar (
     .clk(vga_clk),
     //.reset(RESET),
@@ -159,7 +163,7 @@ Moving_Cars_Top MovingCar (
     .level_out(level),
     .score_out(score),
     .moving_cars_out(moving_cars_out));
-    
+// You Win instance     
 You_Win_Top YouWin (
     .clk(vga_clk),
     .pix_row(pix_row),
@@ -167,7 +171,8 @@ You_Win_Top YouWin (
     .score_in(score),
     .win_reset_flag(win_reset_flag),
     .you_win_out(you_win_out));
-    
+
+// Game Over instance     
 Game_Over_Top GameOver (
     .clk(vga_clk),
     .pix_row(pix_row),
@@ -177,6 +182,7 @@ Game_Over_Top GameOver (
     .collosion_flag(collision_flag),
     .game_over_out(game_over_out));
 
+// Combine module instance 
 Combine_Top Combine (
 	.clk(vga_clk),
     .pix_row(pix_row),
